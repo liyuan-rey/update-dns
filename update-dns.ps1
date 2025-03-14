@@ -5,7 +5,7 @@ param (
 	[string]$LogFilePath = "update-dns.log"
 )
 
-$filePath = Join-Path -Path $PSScriptRoot -ChildPath $LogFilePath
+$logPath = Join-Path -Path $PSScriptRoot -ChildPath $LogFilePath
 
 function Write-CustomLog {
 	param (
@@ -34,7 +34,7 @@ function Write-InfoLog {
 		[Parameter(Mandatory = $true)]
 		[string]$LogContent
 	)
-	Write-CustomLog -LogFilePath $filePath -LogType "INFO" -LogContent $LogContent
+	Write-CustomLog -LogFilePath $logPath -LogType "INFO" -LogContent $LogContent
 }
 
 function Write-WarningLog {
@@ -42,7 +42,7 @@ function Write-WarningLog {
 		[Parameter(Mandatory = $true)]
 		[string]$LogContent
 	)
-	Write-CustomLog -LogFilePath $filePath -LogType "WARNING" -LogContent $LogContent
+	Write-CustomLog -LogFilePath $logPath -LogType "WARNING" -LogContent $LogContent
 }
 
 function IsValidIPv4 {
@@ -55,7 +55,7 @@ function IsValidIPv4 {
 
 try {
 	# 从 .env 文件加载数据
-	$envFilePath = ".\.env"
+	$envFilePath = Join-Path -Path $PSScriptRoot -ChildPath ".env"
 	if (Test-Path -Path $envFilePath) {
 		# 读取.env文件的所有行
 		$envLines = Get-Content -Path $envFilePath
@@ -85,7 +85,7 @@ try {
 			}
 		}
 	}
- else {
+	else {
 		Write-WarningLog("The .env file was not found at $envFilePath.")
 		exit 1
 	}

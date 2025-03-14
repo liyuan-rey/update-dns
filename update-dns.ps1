@@ -1,4 +1,11 @@
-$filePath = Join-Path -Path $PSScriptRoot -ChildPath update-dns.log
+# Usage: PowerShell -File update-dns.ps1
+# Description: Update DNS record on Cloudflare to point to the current public IP address.
+
+param (
+	[string]$LogFilePath = "update-dns.log"
+)
+
+$filePath = Join-Path -Path $PSScriptRoot -ChildPath $LogFilePath
 
 function Write-CustomLog {
 	param (
@@ -27,8 +34,7 @@ function Write-InfoLog {
 		[Parameter(Mandatory = $true)]
 		[string]$LogContent
 	)
-	# Write-CustomLog($filePath.ToString(), "INFO", $LogContent)
-	Write-Host $LogContent
+	Write-CustomLog -LogFilePath $filePath -LogType "INFO" -LogContent $LogContent
 }
 
 function Write-WarningLog {
@@ -36,8 +42,7 @@ function Write-WarningLog {
 		[Parameter(Mandatory = $true)]
 		[string]$LogContent
 	)
-	# Write-CustomLog($filePath.ToString(), "WARNING", $LogContent)
-	Write-Warning $LogContent
+	Write-CustomLog -LogFilePath $filePath -LogType "WARNING" -LogContent $LogContent
 }
 
 function IsValidIPv4 {
@@ -59,8 +64,8 @@ try {
 		foreach ($line in $envLines) {
 			# 忽略空行和以#开头的注释行
 			if ($line -notmatch "^\s*(#|$)") {
-				# 使用等号分割键值对
-				$keyValue = $line -split '=', 2
+				# 使用等号分割键值对，并考虑等号两边可能存在的空格
+				$keyValue = $line -split '\s*=\s*', 2
 
 				if ($keyValue.Length -eq 2) {
 					$key = $keyValue[0].Trim()
